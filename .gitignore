@@ -1,0 +1,6 @@
+.vercel
+node_modules
+.DS_Store
+*.log
+.cursor/debug*.log
+.cursor/**/debug*.log

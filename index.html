@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Space Extinsion</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+    <header class="hud">
+      <div class="hud-brand">SPACE EXTINSION</div>
+      <div class="hud-stats">
+        <span>SCORE <strong id="score">0</strong></span>
+        <span>BEST <strong id="best">0</strong></span>
+        <span>LEVEL <strong id="level">1</strong></span>
+        <span>WAVE <strong id="wave">1</strong></span>
+        <span>LIVES <strong id="lives">5</strong></span>
+        <span>COMBO <strong id="combo">0</strong></span>
+        <span class="buffs" id="buffs"></span>
+      </div>
+    </header>
+
+    <div class="stage">
+      <canvas id="game" width="960" height="640" aria-label="Space Extinsion game"></canvas>
+      <div id="touch-ui" class="touch-ui hidden" aria-hidden="true">
+        <div id="joy-base" class="joy-base">
+          <div id="joy-knob" class="joy-knob"></div>
+        </div>
+        <div class="touch-btns">
+          <button type="button" id="touch-special" class="touch-btn">SPC</button>
+          <button type="button" id="touch-fire" class="touch-btn fire">FIRE</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="overlay" class="overlay">
+      <div class="panel">
+        <h1 id="title">SPACE EXTINSION</h1>
+        <p id="subtitle">10 levels. Clear bosses, upgrade, unlock ships. Best score is saved.</p>
+        <p class="best-line">BEST SCORE <strong id="best-menu">0</strong></p>
+        <p class="best-line challenge-best">CORRIDOR BEST <strong id="challenge-best">0</strong></p>
+        <div class="menu-section">
+          <div class="menu-label">MISSION</div>
+          <div id="level-select" class="level-select" role="listbox" aria-label="Select level"></div>
+        </div>
+        <div class="menu-section">
+          <div class="menu-label">SHIP</div>
+          <div id="ship-select" class="ship-select"></div>
+        </div>
+        <div class="menu-section volume-row">
+          <div class="menu-label">VOLUME</div>
+          <input id="volume-slider" type="range" min="0" max="100" value="70" aria-label="Volume" />
+        </div>
+        <ul class="controls">
+          <li class="kb-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / arrows — move</li>
+          <li class="kb-hint"><kbd>Space</kbd> — shoot · <kbd>Q</kbd> — special</li>
+          <li class="kb-hint"><kbd>P</kbd> / <kbd>Esc</kbd> — pause · <kbd>M</kbd> — mute</li>
+          <li class="kb-hint">Near-miss &amp; perfect waves for bonus score</li>
+          <li class="touch-hint">Left stick — move · FIRE / SPC — shoot &amp; special</li>
+          <li>Shop after each boss — Daily Challenge: endless waves, mini-bosses, 3 lives, no shop</li>
+        </ul>
+        <div class="menu-actions">
+          <button id="start-btn" type="button">START MISSION</button>
+          <button id="challenge-btn" type="button" class="ghost">DAILY CHALLENGE</button>
+          <button id="mute-btn" type="button" class="ghost">MUTE</button>
+          <button id="meta-btn" type="button" class="ghost">CODEX</button>
+          <button id="code-btn" type="button" class="ghost">CODE</button>
+        </div>
+        <div id="meta-panel" class="meta-panel hidden"></div>
+        <div id="code-panel" class="code-panel hidden" aria-hidden="true">
+          <div class="menu-label">ACCESS CODE</div>
+          <p class="code-hint">Enter clearance code</p>
+          <input id="code-input" type="text" autocomplete="off" spellcheck="false" maxlength="32" placeholder="······" aria-label="Access code" />
+          <div class="code-actions">
+            <button id="code-submit" type="button">SUBMIT</button>
+            <button id="code-cancel" type="button" class="ghost">BACK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="rec-badge" class="rec-badge hidden" aria-live="polite">REC</div>
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <script src="game.js?v=touch-spc-gate-v1"></script>
+</body>
+</html>
