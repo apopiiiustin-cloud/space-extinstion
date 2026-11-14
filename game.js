@@ -42,8 +42,6 @@ const titleEl = document.getElementById("title");
 const subtitleEl = document.getElementById("subtitle");
 const startBtn = document.getElementById("start-btn");
 const challengeBtn = document.getElementById("challenge-btn");
-const metaBtn = document.getElementById("meta-btn");
-const codeBtn = document.getElementById("code-btn");
 const codePanelEl = document.getElementById("code-panel");
 const codeInputEl = document.getElementById("code-input");
 const codeSubmitBtn = document.getElementById("code-submit");
@@ -51,6 +49,7 @@ const codeCancelBtn = document.getElementById("code-cancel");
 const metaPanelEl = document.getElementById("meta-panel");
 const volumeSlider = document.getElementById("volume-slider");
 const muteBtn = document.getElementById("mute-btn");
+const menuTabsEl = document.querySelector(".menu-tabs");
 const recBtn = document.getElementById("rec-btn");
 const exportBtn = document.getElementById("export-btn");
 const recBadge = document.getElementById("rec-badge");
@@ -71,6 +70,7 @@ const joyBase = document.getElementById("joy-base");
 const joyKnob = document.getElementById("joy-knob");
 const touchFire = document.getElementById("touch-fire");
 const touchSpecial = document.getElementById("touch-special");
+const touchPause = document.getElementById("touch-pause");
 
 // --- canvas ---
 const W = canvas.width;
@@ -268,7 +268,7 @@ const audio = createAudio({
   getVolume: () => Number(save.volume) || 0.7,
   getSelectedShipId: () => selectedShipId,
 });
-const { ensureAudio, applyVolume, duckMusic, tickDuck, stopMusic, sfx } = audio;
+const { ensureAudio, suspendAudio, resumeAudio, applyVolume, duckMusic, tickDuck, stopMusic, sfx } = audio;
 function musicModeForPhase() {
   if (phase === "boss" || phase === "bossIntro" || phase === "warning") return "boss";
   if (phase === "menu" || phase === "won" || !running) return "off";
@@ -496,11 +496,15 @@ function persistSave(immediate = false) {
 
 // --- juice / HUD helpers ---
 function trimFx() {
-  if (particles.length > 120) particles.splice(0, particles.length - 120);
-  if (trails.length > 80) trails.splice(0, trails.length - 80);
-  if (bullets.length > 200) {
+  const pCap = mobileLite ? 70 : 120;
+  const tCap = mobileLite ? 45 : 80;
+  const bSoft = mobileLite ? 140 : 200;
+  const bKeep = mobileLite ? 110 : 180;
+  if (particles.length > pCap) particles.splice(0, particles.length - pCap);
+  if (trails.length > tCap) trails.splice(0, trails.length - tCap);
+  if (bullets.length > bSoft) {
     const keep = [];
-    for (let i = bullets.length - 1; i >= 0 && keep.length < 180; i--) keep.push(bullets[i]);
+    for (let i = bullets.length - 1; i >= 0 && keep.length < bKeep; i--) keep.push(bullets[i]);
     bullets = keep.reverse();
   }
 }
@@ -582,6 +586,85 @@ function isTouchDevice() {
   );
 }
 
+const mobileLite = isTouchDevice();
+const STAR_COUNT = mobileLite ? 80 : 160;
+let hudBuffsCache = "";
+let menuIdleFrame = 0;
+let menuTab = "play";
+
+function isDocumentFullscreen() {
+  return !!(
+    document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    document.mozFullScreenElement ||
+    document.msFullscreenElement
+  );
+}
+
+async function requestGameFullscreen() {
+  const el = document.documentElement;
+  try {
+    if (isDocumentFullscreen()) return true;
+    if (el.requestFullscreen) await el.requestFullscreen({ navigationUI: "hide" });
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    else if (el.webkitRequestFullScreen) el.webkitRequestFullScreen();
+    else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
+    else if (el.msRequestFullscreen) el.msRequestFullscreen();
+    else return false;
+  } catch {
+    return false;
+  }
+  try {
+    const orient = screen.orientation;
+    if (orient && typeof orient.lock === "function") await orient.lock("landscape");
+  } catch {
+    /* orientation lock is optional */
+  }
+  return isDocumentFullscreen();
+}
+
+async function exitGameFullscreen() {
+  try {
+    if (!isDocumentFullscreen()) return;
+    if (document.exitFullscreen) await document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+    else if (document.msExitFullscreen) document.msExitFullscreen();
+  } catch {
+    /* ignore */
+  }
+  try {
+    const orient = screen.orientation;
+    if (orient && typeof orient.unlock === "function") orient.unlock();
+  } catch {
+    /* ignore */
+  }
+}
+
+function setMenuTab(id, opts = {}) {
+  const tabId = ["play", "settings", "codex", "code"].includes(id) ? id : "play";
+  menuTab = tabId;
+  const tabs = menuTabsEl ? menuTabsEl.querySelectorAll("[role='tab']") : [];
+  tabs.forEach((btn) => {
+    const selected = btn.dataset.tab === tabId;
+    btn.setAttribute("aria-selected", selected ? "true" : "false");
+  });
+  ["play", "settings", "codex", "code"].forEach((name) => {
+    const panel = document.getElementById(`tab-${name}`);
+    if (!panel) return;
+    if (name === tabId) panel.removeAttribute("hidden");
+    else panel.setAttribute("hidden", "");
+  });
+  if (tabId === "codex") renderMetaPanel();
+  if (tabId === "code" && codeInputEl) {
+    if (!opts.keepCode) codeInputEl.value = "";
+    setTimeout(() => codeInputEl.focus(), 30);
+  } else if (codeInputEl && !opts.keepCode) {
+    codeInputEl.value = "";
+  }
+  if (!opts.silent) sfx("ui");
+}
+
 /** GOD CORE only with ?god=1 — hidden on phone, Vercel, and normal play. */
 function godModeEnabled() {
   try {
@@ -596,23 +679,6 @@ const AEGIS_CODE = "Aegis321#";
 /** AEGIS VEIL owner-only: CODE redeem or ?aegis=1 — invisible otherwise. */
 function aegisEnabled() {
   return aegisQueryEnabled() || !!(save && save.aegisUnlocked);
-}
-
-function setCodePanelOpen(open) {
-  if (!codePanelEl) return;
-  if (open) {
-    if (metaPanelEl) metaPanelEl.classList.add("hidden");
-    codePanelEl.classList.remove("hidden");
-    codePanelEl.setAttribute("aria-hidden", "false");
-    if (codeInputEl) {
-      codeInputEl.value = "";
-      setTimeout(() => codeInputEl.focus(), 30);
-    }
-  } else {
-    codePanelEl.classList.add("hidden");
-    codePanelEl.setAttribute("aria-hidden", "true");
-    if (codeInputEl) codeInputEl.value = "";
-  }
 }
 
 function tryRedeemCode(raw) {
@@ -632,7 +698,7 @@ function tryRedeemCode(raw) {
     persistSave(true);
     sanitizeSelectedShip();
     renderShipSelect();
-    setCodePanelOpen(false);
+    setMenuTab("play", { silent: true });
     showToast("AEGIS VEIL ONLINE");
     sfx("achieve");
     return true;
@@ -818,7 +884,7 @@ function refreshMenuScores() {
     const bs = save.bestChallenge || 0;
     challengeBestEl.textContent = bw ? `${bs} (W${bw})` : String(bs);
   }
-  muteBtn.textContent = save.muted ? "UNMUTE" : "MUTE";
+  if (muteBtn) muteBtn.textContent = save.muted ? "UNMUTE" : "MUTE";
   applyVolume();
 }
 
@@ -1228,7 +1294,7 @@ function makePixelPlanet(seedColors) {
 
 function applyTheme(t) {
   theme = t;
-  stars = Array.from({ length: 160 }, () => ({
+  stars = Array.from({ length: STAR_COUNT }, () => ({
     x: Math.random() * W,
     y: Math.random() * H,
     z: 0.15 + Math.random() * 1.4,
@@ -1304,10 +1370,15 @@ function updateHud() {
     else chips.push('<span class="buff-chip">SPC READY</span>');
   }
   if (credits > 0) chips.push(`<span class="buff-chip shield">CR ${credits}</span>`);
-  buffsEl.innerHTML = chips.join("");
+  const next = chips.join("");
+  if (next !== hudBuffsCache) {
+    hudBuffsCache = next;
+    buffsEl.innerHTML = next;
+  }
 }
 
 function showOverlay(title, subtitle, buttonText, opts = {}) {
+  exitGameFullscreen();
   titleEl.textContent = title;
   subtitleEl.textContent = subtitle;
   startBtn.textContent = buttonText;
@@ -1315,6 +1386,7 @@ function showOverlay(title, subtitle, buttonText, opts = {}) {
   refreshMenuScores();
   renderLevelSelect();
   renderShipSelect();
+  setMenuTab("play", { silent: true });
   overlay.classList.remove("hidden");
 }
 
@@ -1384,6 +1456,7 @@ function challengeRulesFor(id) {
 }
 
 function startChallenge() {
+  requestGameFullscreen();
   challengeMode = true;
   challengeId = todayChallengeId();
   const rules = challengeRulesFor(challengeId);
@@ -1448,6 +1521,7 @@ function startChallenge() {
 }
 
 function startGame() {
+  requestGameFullscreen();
   ensureAudio();
   sfx("ui");
   nearMissRun = 0;
@@ -4125,10 +4199,17 @@ function drawHazards() {
     if (h.kind === "slowzone") {
       const x0 = px(h.x - h.w / 2);
       const y0 = px(h.y - h.h / 2);
-      ctx.globalAlpha = 0.12;
-      for (let y = y0; y < y0 + h.h; y += 4) {
-        for (let x = x0; x < x0 + h.w; x += 4) {
-          if ((x + y) % 8 === 0) fillPx(x, y, 3, 3, "#8ec8ff");
+      const zw = Math.max(1, px(h.w));
+      const zh = Math.max(1, px(h.h));
+      ctx.globalAlpha = 0.1;
+      ctx.fillStyle = "#8ec8ff";
+      ctx.fillRect(x0, y0, zw, zh);
+      if (!mobileLite) {
+        ctx.globalAlpha = 0.14;
+        for (let y = y0; y < y0 + zh; y += 8) {
+          for (let x = x0; x < x0 + zw; x += 8) {
+            if ((x + y) % 16 === 0) fillPx(x, y, 3, 3, "#8ec8ff");
+          }
         }
       }
       ctx.globalAlpha = 1;
@@ -4159,7 +4240,10 @@ function drawShop() {
   ctx.fillStyle = "rgba(200,230,255,0.9)";
   ctx.fillText(`Credits: ${credits}`, W / 2, 104);
   ctx.fillStyle = "#ffe8a3";
-  ctx.fillText("CLICK a card  or  press 1 / 2 / 3   ·   Enter = free & continue", W / 2, 128);
+  const shopHint = mobileLite || document.body.classList.contains("touch-device")
+    ? "Tap a card · Tap FREE to continue"
+    : "CLICK a card  or  press 1 / 2 / 3   ·   Enter = free & continue";
+  ctx.fillText(shopHint, W / 2, 128);
   const cardW = 200;
   const gap = 24;
   const total = shopOffers.length * cardW + (shopOffers.length - 1) * gap;
@@ -4204,7 +4288,10 @@ function drawPause() {
   ctx.fillText("PAUSED", W / 2, H / 2 - 20);
   ctx.font = "14px Share Tech Mono, monospace";
   ctx.fillStyle = "rgba(200,220,255,0.9)";
-  ctx.fillText("P / Esc resume · M mute · R restart mission", W / 2, H / 2 + 18);
+  const pauseHint = mobileLite || document.body.classList.contains("touch-device")
+    ? "Tap to resume · hold FIRE to shoot"
+    : "P / Esc resume · M mute · R restart mission";
+  ctx.fillText(pauseHint, W / 2, H / 2 + 18);
 }
 
 function drawTransitionVeil() {
@@ -4441,12 +4528,17 @@ function loop(now) {
     }
   } else {
     time += dt;
-    for (const star of stars) {
-      star.y += star.z * 35 * dt;
-      star.tw += dt * (1.2 + star.z);
-      if (star.y > H) {
-        star.y = 0;
-        star.x = Math.random() * W;
+    const menuIdle = !running && !overlay.classList.contains("hidden");
+    menuIdleFrame++;
+    const skipStars = menuIdle && (menuIdleFrame & 1) === 1;
+    if (!skipStars) {
+      for (const star of stars) {
+        star.y += star.z * 35 * dt * (menuIdle ? 2 : 1);
+        star.tw += dt * (1.2 + star.z);
+        if (star.y > H) {
+          star.y = 0;
+          star.x = Math.random() * W;
+        }
       }
     }
   }
@@ -4458,7 +4550,7 @@ function loop(now) {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
     } catch (_) {}
   }
-  tickPlayRecorder(now);
+  if (!mobileLite) tickPlayRecorder(now);
   requestAnimationFrame(loop);
 }
 
@@ -4516,20 +4608,12 @@ if (challengeBtn) {
     startChallenge();
   });
 }
-if (metaBtn && metaPanelEl) {
-  metaBtn.addEventListener("click", () => {
-    setCodePanelOpen(false);
-    const open = metaPanelEl.classList.toggle("hidden") === false;
-    if (open) renderMetaPanel();
-    sfx("ui");
-  });
-}
-if (codeBtn && codePanelEl) {
-  codeBtn.addEventListener("click", () => {
+if (menuTabsEl) {
+  menuTabsEl.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-tab]");
+    if (!btn || !menuTabsEl.contains(btn)) return;
     ensureAudio();
-    sfx("ui");
-    const opening = codePanelEl.classList.contains("hidden");
-    setCodePanelOpen(opening);
+    setMenuTab(btn.dataset.tab);
   });
 }
 if (codeSubmitBtn) {
@@ -4540,8 +4624,8 @@ if (codeSubmitBtn) {
 }
 if (codeCancelBtn) {
   codeCancelBtn.addEventListener("click", () => {
+    if (codeInputEl) codeInputEl.value = "";
     sfx("ui");
-    setCodePanelOpen(false);
   });
 }
 if (codeInputEl) {
@@ -4551,7 +4635,7 @@ if (codeInputEl) {
       tryRedeemCode(codeInputEl.value);
     } else if (e.key === "Escape") {
       e.preventDefault();
-      setCodePanelOpen(false);
+      setMenuTab("play");
     }
   });
 }
@@ -4564,14 +4648,16 @@ if (volumeSlider) {
     persistSave();
   });
 }
-muteBtn.addEventListener("click", () => {
-  save.muted = !save.muted;
-  persistSave();
-  refreshMenuScores();
-  if (save.muted) stopMusic();
-  else startMusic(musicModeForPhase());
-  sfx("ui");
-});
+if (muteBtn) {
+  muteBtn.addEventListener("click", () => {
+    save.muted = !save.muted;
+    persistSave();
+    refreshMenuScores();
+    if (save.muted) stopMusic();
+    else startMusic(musicModeForPhase());
+    sfx("ui");
+  });
+}
 if (recBtn) recBtn.addEventListener("click", () => toggleRecording());
 if (exportBtn) exportBtn.addEventListener("click", () => exportPlaySession());
 updateRecUi();
@@ -4584,7 +4670,7 @@ if (coarse) {
   touchUi.setAttribute("aria-hidden", "false");
 }
 
-// Mobile portrait: rotate prompt + auto-pause mid-game
+// Mobile portrait: rotate prompt + auto-pause mid-game (no auto-resume)
 const rotatePrompt = document.getElementById("rotate-prompt");
 const portraitMq = window.matchMedia("(max-width: 900px) and (orientation: portrait)");
 
@@ -4610,8 +4696,16 @@ if (typeof portraitMq.addEventListener === "function") {
   portraitMq.addListener(syncRotatePrompt);
 }
 window.addEventListener("orientationchange", () => {
-  // orientationchange can fire before layout settles
   requestAnimationFrame(syncRotatePrompt);
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    if (running && !paused && phase !== "shop") {
+      paused = true;
+    }
+    suspendAudio();
+  }
 });
 
 function joyHandler(clientX, clientY) {
@@ -4633,6 +4727,8 @@ function joyHandler(clientX, clientY) {
 
 joyBase.addEventListener("pointerdown", (e) => {
   e.preventDefault();
+  ensureAudio();
+  resumeAudio();
   joyBase.setPointerCapture(e.pointerId);
   joyHandler(e.clientX, e.clientY);
 });
@@ -4651,6 +4747,8 @@ joyBase.addEventListener("pointercancel", () => {
 });
 touchFire.addEventListener("pointerdown", (e) => {
   e.preventDefault();
+  ensureAudio();
+  resumeAudio();
   touchFire.setPointerCapture(e.pointerId);
   touchFiring = true;
 });
@@ -4662,9 +4760,20 @@ touchFire.addEventListener("pointercancel", () => {
 });
 touchSpecial.addEventListener("pointerdown", (e) => {
   e.preventDefault();
+  ensureAudio();
+  resumeAudio();
   touchSpecialHeld = true;
   fireSpecial();
 });
+if (touchPause) {
+  touchPause.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    ensureAudio();
+    resumeAudio();
+    togglePause();
+  });
+}
 
 function shopPickAt(clientX, clientY) {
   if (phase !== "shop") return;
@@ -4686,9 +4795,16 @@ function shopPickAt(clientX, clientY) {
 }
 
 canvas.addEventListener("pointerdown", (e) => {
+  ensureAudio();
+  resumeAudio();
   if (phase === "bossIntro") {
     e.preventDefault();
     bossIntroTimer = 0;
+    return;
+  }
+  if (paused && running) {
+    e.preventDefault();
+    togglePause();
     return;
   }
   if (phase !== "shop") return;
@@ -4705,6 +4821,7 @@ if (save.selectedShipId !== selectedShipId) {
 refreshMenuScores();
 renderLevelSelect();
 renderShipSelect();
+setMenuTab("play", { silent: true });
 applyTheme(LEVELS[Math.max(0, (save.selectedStartLevel || 1) - 1)].theme);
 resetPlayer(false);
 lastTime = performance.now();

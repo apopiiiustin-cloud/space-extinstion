@@ -59,6 +59,25 @@ export function createAudio(deps) {
     return audioCtx;
   }
 
+  function suspendAudio() {
+    if (!audioCtx) return;
+    try {
+      if (audioCtx.state === "running") audioCtx.suspend();
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function resumeAudio() {
+    if (!audioCtx) return ensureAudio();
+    try {
+      if (audioCtx.state === "suspended") audioCtx.resume();
+    } catch {
+      /* ignore */
+    }
+    return audioCtx;
+  }
+
   function applyVolume() {
     const muted = deps.getMuted();
     const vol = Math.max(0, Math.min(1, Number(deps.getVolume()) || 0.7));
@@ -298,6 +317,8 @@ export function createAudio(deps) {
 
   return {
     ensureAudio,
+    suspendAudio,
+    resumeAudio,
     applyVolume,
     duckMusic,
     tickDuck,

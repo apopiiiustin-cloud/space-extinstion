@@ -37,6 +37,7 @@
     <div class="stage">
       <canvas id="game" width="960" height="640" aria-label="Space Extinsion game"></canvas>
       <div id="touch-ui" class="touch-ui hidden" aria-hidden="true">
+        <button type="button" id="touch-pause" class="touch-pause" aria-label="Pause">II</button>
         <div id="joy-base" class="joy-base">
           <div id="joy-knob" class="joy-knob"></div>
         </div>
@@ -53,43 +54,62 @@
         <p id="subtitle">10 levels. Clear bosses, upgrade, unlock ships. Best score is saved.</p>
         <p class="best-line">BEST SCORE <strong id="best-menu">0</strong></p>
         <p class="best-line challenge-best">CORRIDOR BEST <strong id="challenge-best">0</strong></p>
-        <div class="menu-section">
-          <div class="menu-label">MISSION</div>
-          <div id="level-select" class="level-select" role="listbox" aria-label="Select level"></div>
-        </div>
-        <div class="menu-section">
-          <div class="menu-label">SHIP</div>
-          <div id="ship-select" class="ship-select"></div>
-        </div>
-        <div class="menu-section volume-row">
-          <div class="menu-label">VOLUME</div>
-          <input id="volume-slider" type="range" min="0" max="100" value="70" aria-label="Volume" />
-        </div>
-        <ul class="controls">
-          <li class="kb-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / arrows — move</li>
-          <li class="kb-hint"><kbd>Space</kbd> — shoot · <kbd>Q</kbd> — special</li>
-          <li class="kb-hint"><kbd>P</kbd> / <kbd>Esc</kbd> — pause · <kbd>M</kbd> — mute</li>
-          <li class="kb-hint">Near-miss &amp; perfect waves for bonus score</li>
-          <li class="touch-hint">Left stick — move · FIRE / SPC — shoot &amp; special</li>
-          <li>Shop after each boss — Daily Challenge: endless waves, mini-bosses, 3 lives, no shop</li>
-        </ul>
-        <div class="menu-actions">
-          <button id="start-btn" type="button">START MISSION</button>
-          <button id="challenge-btn" type="button" class="ghost">DAILY CHALLENGE</button>
-          <button id="mute-btn" type="button" class="ghost">MUTE</button>
-          <button id="meta-btn" type="button" class="ghost">CODEX</button>
-          <button id="code-btn" type="button" class="ghost">CODE</button>
-        </div>
-        <div id="meta-panel" class="meta-panel hidden"></div>
-        <div id="code-panel" class="code-panel hidden" aria-hidden="true">
-          <div class="menu-label">ACCESS CODE</div>
-          <p class="code-hint">Enter clearance code</p>
-          <input id="code-input" type="text" autocomplete="off" spellcheck="false" maxlength="32" placeholder="······" aria-label="Access code" />
-          <div class="code-actions">
-            <button id="code-submit" type="button">SUBMIT</button>
-            <button id="code-cancel" type="button" class="ghost">BACK</button>
+
+        <nav class="menu-tabs" role="tablist" aria-label="Menu">
+          <button type="button" class="menu-tab" role="tab" data-tab="play" id="tab-btn-play" aria-selected="true" aria-controls="tab-play">PLAY</button>
+          <button type="button" class="menu-tab" role="tab" data-tab="settings" id="tab-btn-settings" aria-selected="false" aria-controls="tab-settings">SETTINGS</button>
+          <button type="button" class="menu-tab" role="tab" data-tab="codex" id="tab-btn-codex" aria-selected="false" aria-controls="tab-codex">CODEX</button>
+          <button type="button" class="menu-tab" role="tab" data-tab="code" id="tab-btn-code" aria-selected="false" aria-controls="tab-code">CODE</button>
+        </nav>
+
+        <section id="tab-play" class="menu-tabpanel" role="tabpanel" aria-labelledby="tab-btn-play">
+          <div class="menu-section">
+            <div class="menu-label">MISSION</div>
+            <div id="level-select" class="level-select" role="listbox" aria-label="Select level"></div>
           </div>
-        </div>
+          <div class="menu-section">
+            <div class="menu-label">SHIP</div>
+            <div id="ship-select" class="ship-select"></div>
+          </div>
+          <ul class="controls">
+            <li class="kb-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / arrows — move</li>
+            <li class="kb-hint"><kbd>Space</kbd> — shoot · <kbd>Q</kbd> — special</li>
+            <li class="kb-hint"><kbd>P</kbd> / <kbd>Esc</kbd> — pause · <kbd>M</kbd> — mute</li>
+            <li class="kb-hint">Near-miss &amp; perfect waves for bonus score</li>
+            <li class="touch-hint">Left stick — move · FIRE / SPC — shoot &amp; special</li>
+            <li>Shop after each boss — Daily Challenge: endless waves, mini-bosses, 3 lives, no shop</li>
+          </ul>
+          <div class="menu-actions">
+            <button id="start-btn" type="button">START MISSION</button>
+            <button id="challenge-btn" type="button" class="ghost">DAILY CHALLENGE</button>
+          </div>
+        </section>
+
+        <section id="tab-settings" class="menu-tabpanel" role="tabpanel" aria-labelledby="tab-btn-settings" hidden>
+          <div class="menu-section volume-row">
+            <div class="menu-label">VOLUME</div>
+            <input id="volume-slider" type="range" min="0" max="100" value="70" aria-label="Volume" />
+          </div>
+          <div class="menu-actions">
+            <button id="mute-btn" type="button" class="ghost">MUTE</button>
+          </div>
+        </section>
+
+        <section id="tab-codex" class="menu-tabpanel" role="tabpanel" aria-labelledby="tab-btn-codex" hidden>
+          <div id="meta-panel" class="meta-panel"></div>
+        </section>
+
+        <section id="tab-code" class="menu-tabpanel" role="tabpanel" aria-labelledby="tab-btn-code" hidden>
+          <div id="code-panel" class="code-panel" aria-hidden="false">
+            <div class="menu-label">ACCESS CODE</div>
+            <p class="code-hint">Enter clearance code</p>
+            <input id="code-input" type="text" autocomplete="off" spellcheck="false" maxlength="32" placeholder="······" aria-label="Access code" />
+            <div class="code-actions">
+              <button id="code-submit" type="button">SUBMIT</button>
+              <button id="code-cancel" type="button" class="ghost">CLEAR</button>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
 
@@ -97,6 +117,6 @@
     <div id="toast" class="toast hidden"></div>
   </div>
 
-  <script type="module" src="game.js?v=cleanup-v2"></script>
+  <script type="module" src="game.js?v=mobile-opt-v1"></script>
 </body>
 </html>

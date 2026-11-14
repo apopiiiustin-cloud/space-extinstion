@@ -164,6 +164,10 @@ body {
   touch-action: pan-y;
 }
 
+body.touch-device .overlay {
+  backdrop-filter: none;
+}
+
 .overlay.hidden {
   opacity: 0;
   pointer-events: none;
@@ -178,6 +182,44 @@ body {
   background: var(--panel);
   border: 1px solid var(--line);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+.menu-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.25rem;
+  margin: 0.35rem 0 1rem;
+  border-bottom: 1px solid rgba(61, 224, 255, 0.28);
+  padding-bottom: 0.15rem;
+}
+
+.menu-tab {
+  font-family: Orbitron, sans-serif;
+  font-weight: 700;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  min-height: 44px;
+  padding: 0.45rem 0.2rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: rgba(180, 210, 255, 0.65);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.menu-tab[aria-selected="true"] {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+.menu-tab:active {
+  color: var(--neon);
+}
+
+.menu-tabpanel[hidden] {
+  display: none;
 }
 
 .menu-section {
@@ -386,19 +428,16 @@ body.touch-device .touch-hint {
 }
 
 .meta-panel {
-  margin-top: 1rem;
+  margin-top: 0;
   text-align: left;
-  max-height: 220px;
+  max-height: min(42vh, 320px);
   overflow-y: auto;
   border: 1px solid rgba(61, 224, 255, 0.28);
   background: rgba(8, 18, 40, 0.75);
   padding: 0.75rem 0.85rem;
   font-size: 0.78rem;
   line-height: 1.45;
-}
-
-.meta-panel.hidden {
-  display: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 .meta-panel h3 {
@@ -418,15 +457,11 @@ body.touch-device .touch-hint {
 }
 
 .code-panel {
-  margin-top: 1rem;
+  margin-top: 0;
   text-align: left;
   border: 1px solid rgba(61, 224, 255, 0.28);
   background: rgba(8, 18, 40, 0.75);
   padding: 0.85rem 0.95rem 1rem;
-}
-
-.code-panel.hidden {
-  display: none;
 }
 
 .code-hint {
@@ -475,8 +510,10 @@ body.touch-device .touch-hint {
   background: linear-gradient(180deg, rgba(61, 224, 255, 0.22), rgba(61, 224, 255, 0.06));
   color: #e8fbff;
   padding: 0.75rem 1.1rem;
+  min-height: 44px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .ghost {
@@ -488,6 +525,14 @@ body.touch-device .touch-hint {
 .ghost:hover {
   transform: translateY(-1px);
   box-shadow: 0 0 24px rgba(61, 224, 255, 0.25);
+}
+
+#start-btn:active,
+.ghost:active,
+.menu-actions button:active {
+  transform: translateY(1px);
+  box-shadow: none;
+  background: rgba(61, 224, 255, 0.18);
 }
 
 .toast {
@@ -611,6 +656,45 @@ body.touch-device .touch-hint {
 .touch-btn.fire {
   border-color: rgba(255, 77, 109, 0.55);
   color: #ff8fab;
+}
+
+.touch-btn:active,
+.joy-base:active {
+  background: rgba(61, 224, 255, 0.28);
+  transform: scale(0.96);
+}
+
+.touch-btn.fire:active {
+  background: rgba(255, 77, 109, 0.28);
+}
+
+.touch-btn.hidden {
+  display: none;
+}
+
+.touch-pause {
+  position: absolute;
+  top: max(0.4rem, env(safe-area-inset-top, 0px));
+  right: max(0.4rem, env(safe-area-inset-right, 0px));
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid rgba(61, 224, 255, 0.5);
+  background: rgba(4, 14, 28, 0.55);
+  color: var(--neon);
+  font-family: Orbitron, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  pointer-events: auto;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  z-index: 6;
+}
+
+.touch-pause:active {
+  background: rgba(61, 224, 255, 0.28);
+  transform: scale(0.96);
 }
 
 .touch-ui.hidden {
@@ -737,28 +821,49 @@ body.touch-device .touch-hint {
   }
 
   .joy-base {
-    width: 84px;
-    height: 84px;
+    width: 96px;
+    height: 96px;
     left: max(0.4rem, env(safe-area-inset-left, 0px));
     bottom: max(0.35rem, env(safe-area-inset-bottom, 0px));
   }
 
   .joy-knob {
-    width: 34px;
-    height: 34px;
-    margin: -17px 0 0 -17px;
+    width: 38px;
+    height: 38px;
+    margin: -19px 0 0 -19px;
   }
 
   .touch-btns {
     right: max(0.4rem, env(safe-area-inset-right, 0px));
     bottom: max(0.35rem, env(safe-area-inset-bottom, 0px));
-    gap: 0.35rem;
+    gap: 0.5rem;
   }
 
   .touch-btn {
-    width: 56px;
-    height: 56px;
-    font-size: 0.58rem;
+    width: 64px;
+    height: 64px;
+    font-size: 0.6rem;
+  }
+
+  .touch-pause {
+    width: 40px;
+    height: 40px;
+    font-size: 0.64rem;
+  }
+
+  .menu-tabs {
+    gap: 0.15rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .menu-tab {
+    min-height: 36px;
+    font-size: 0.55rem;
+    padding: 0.3rem 0.1rem;
+  }
+
+  .meta-panel {
+    max-height: min(36vh, 200px);
   }
 
   .panel {
@@ -823,7 +928,11 @@ body.touch-device .touch-hint {
     display: none;
   }
 
-  .menu-actions .ghost:not(#mute-btn) {
+  .controls {
+    display: none;
+  }
+
+  .panel #subtitle {
     display: none;
   }
 }
