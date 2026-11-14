@@ -4,25 +4,25 @@ overview: Plan pe faze ca să facem Space Shuttles mai fain — audio, boss intr
 todos:
   - id: phase-0-foundation
     content: "Faza 0: curățare debug fetch, deploy Vercel stabil, versiune/cache clară"
-    status: pending
+    status: completed
   - id: phase-1-audio
     content: "Faza 1: SFX pack, music loops, ducking, volume slider + mute persist"
-    status: pending
+    status: completed
   - id: phase-2-boss-ending
     content: "Faza 2: boss intros lore + ending L10 cu medalii/cosmetic"
-    status: pending
+    status: completed
   - id: phase-3-challenge
     content: "Faza 3: Challenge/Daily run local + bestChallenge în save"
-    status: pending
+    status: completed
   - id: phase-4-gameplay
     content: "Faza 4: elites, near-miss, perfect wave, secret bonus wave, hold-focus fire"
-    status: pending
+    status: completed
   - id: phase-5-juice
     content: "Faza 5: hit-stop, flash, trails combo, shake profilat, pickup suck"
-    status: pending
+    status: completed
   - id: phase-6-meta
     content: "Faza 6: achievements panel, codex boss/nave, statistici run"
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -118,12 +118,14 @@ S5: Faza 6 (codex / achievements)
 ```
 
 ## Definition of done (jocul e „mai fain”)
-- [ ] Sună bine (SFX + muzică)
-- [ ] Bossii au prezență (intro)
-- [ ] L10 are final
-- [ ] Există motiv de replay (challenge)
-- [ ] Combate are micro-skill (near-miss / perfect wave)
-- [ ] Progresie vizibilă (achievements / codex)
+- [x] Sună bine (SFX + muzică)
+- [x] Bossii au prezență (intro)
+- [x] L10 are final
+- [x] Există motiv de replay (challenge)
+- [x] Combate are micro-skill (near-miss / perfect wave)
+- [x] Progresie vizibilă (achievements / codex)
+
+> Status sync (cleanup): fazele de mai sus sunt deja în cod; planul e arhivă de progres, nu backlog activ.
 
 ## Reguli pe implementare
 - O fază pe rând; verifică pe desktop după fiecare

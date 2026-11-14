@@ -13,6 +13,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
 </head>
 <body>
+  <div id="rotate-prompt" class="rotate-prompt" aria-hidden="true" aria-live="polite">
+    <div class="rotate-prompt-inner">
+      <div class="rotate-icon" aria-hidden="true"></div>
+      <p class="rotate-title">ROTATE DEVICE</p>
+      <p class="rotate-sub">Landscape only · turn your phone sideways to play</p>
+    </div>
+  </div>
   <div id="app">
     <header class="hud">
       <div class="hud-brand">SPACE EXTINSION</div>
@@ -90,6 +97,6 @@
     <div id="toast" class="toast hidden"></div>
   </div>
 
-  <script src="game.js?v=touch-spc-gate-v1"></script>
+  <script type="module" src="game.js?v=cleanup-v2"></script>
 </body>
 </html>
