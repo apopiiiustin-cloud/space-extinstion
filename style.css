@@ -16,6 +16,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html,
@@ -30,6 +31,10 @@ body {
   font-family: "Share Tech Mono", monospace;
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
 }
 
 body {
@@ -44,6 +49,13 @@ body {
     env(safe-area-inset-right, 0px)
     env(safe-area-inset-bottom, 0px)
     env(safe-area-inset-left, 0px);
+}
+
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
 }
 
 #app {

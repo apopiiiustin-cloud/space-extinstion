@@ -4611,6 +4611,12 @@ if (recBtn) recBtn.addEventListener("click", () => toggleRecording());
 if (exportBtn) exportBtn.addEventListener("click", () => exportPlaySession());
 updateRecUi();
 
+document.addEventListener("selectstart", (e) => {
+  if (e.target && e.target.closest && e.target.closest("input, textarea")) return;
+  e.preventDefault();
+});
+document.addEventListener("dragstart", (e) => e.preventDefault());
+
 // Touch controls
 const coarse = isTouchDevice();
 if (coarse) {
