@@ -597,23 +597,7 @@ body.touch-device .touch-hint {
 }
 
 .toast {
-  position: fixed;
-  left: 50%;
-  bottom: 1.4rem;
-  transform: translateX(-50%);
-  z-index: 20;
-  padding: 0.55rem 0.9rem;
-  border: 1px solid rgba(255, 209, 102, 0.55);
-  background: rgba(10, 16, 32, 0.92);
-  color: var(--gold);
-  font-family: Orbitron, sans-serif;
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  pointer-events: none;
-}
-
-.toast.hidden {
-  opacity: 0;
+  display: none;
 }
 
 .rec-badge {

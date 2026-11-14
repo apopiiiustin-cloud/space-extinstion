@@ -518,10 +518,8 @@ function addHitStop(t = 0.05) {
   hitStop = Math.max(hitStop, t);
 }
 
-function showToast(text) {
-  toasts.push({ text, life: 2.4 });
-  toastEl.textContent = text;
-  toastEl.classList.remove("hidden");
+function showToast(_text) {
+  /* bottom toasts disabled for a cleaner mobile play view */
 }
 
 
