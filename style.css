@@ -75,24 +75,6 @@ body.touch-device #app {
   );
 }
 
-body.immersive {
-  padding: 0;
-  background: #000;
-}
-
-body.immersive #app {
-  width: 100%;
-  max-width: none;
-  height: 100dvh;
-  gap: 0.25rem;
-  padding:
-    env(safe-area-inset-top, 0px)
-    env(safe-area-inset-right, 0px)
-    env(safe-area-inset-bottom, 0px)
-    env(safe-area-inset-left, 0px);
-  align-content: center;
-}
-
 .play-shell {
   position: relative;
   display: grid;
@@ -672,24 +654,22 @@ body.touch-device .touch-ui:not(.hidden) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 0.55rem;
   padding: 0.35rem 0.2rem;
   pointer-events: none;
   min-width: 0;
+  overflow: visible;
 }
 
 .touch-rail-left {
   grid-column: 1;
   grid-row: 1;
-  justify-content: center;
 }
 
 .touch-rail-right {
   grid-column: 3;
   grid-row: 1;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .joy-base {
@@ -723,10 +703,12 @@ body.touch-device .touch-ui:not(.hidden) {
   position: relative;
   right: auto;
   bottom: auto;
-  display: grid;
-  gap: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   pointer-events: auto;
-  justify-items: center;
 }
 
 .touch-btn {
@@ -781,7 +763,6 @@ body.touch-device .touch-ui:not(.hidden) {
   -webkit-tap-highlight-color: transparent;
   user-select: none;
   flex-shrink: 0;
-  margin-top: 0.15rem;
 }
 
 .touch-pause:active {

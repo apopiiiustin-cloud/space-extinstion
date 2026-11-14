@@ -592,74 +592,6 @@ let hudBuffsCache = "";
 let menuIdleFrame = 0;
 let menuTab = "play";
 
-function isDocumentFullscreen() {
-  return !!(
-    document.fullscreenElement ||
-    document.webkitFullscreenElement ||
-    document.mozFullScreenElement ||
-    document.msFullscreenElement
-  );
-}
-
-/** Must run synchronously inside a user-gesture handler (tap/click). */
-function requestGameFullscreen() {
-  document.body.classList.add("immersive");
-  const el = document.documentElement;
-  try {
-    if (!isDocumentFullscreen()) {
-      if (typeof el.requestFullscreen === "function") {
-        const p = el.requestFullscreen();
-        if (p && typeof p.catch === "function") p.catch(() => {});
-      } else if (typeof el.webkitRequestFullscreen === "function") {
-        el.webkitRequestFullscreen();
-      } else if (typeof el.webkitRequestFullScreen === "function") {
-        el.webkitRequestFullScreen();
-      } else if (typeof el.mozRequestFullScreen === "function") {
-        el.mozRequestFullScreen();
-      } else if (typeof el.msRequestFullscreen === "function") {
-        el.msRequestFullscreen();
-      }
-    }
-  } catch {
-    /* API unsupported or blocked — immersive CSS still applies */
-  }
-  try {
-    const orient = screen.orientation;
-    if (orient && typeof orient.lock === "function") {
-      const p = orient.lock("landscape");
-      if (p && typeof p.catch === "function") p.catch(() => {});
-    }
-  } catch {
-    /* optional */
-  }
-}
-
-function exitGameFullscreen() {
-  document.body.classList.remove("immersive");
-  try {
-    if (isDocumentFullscreen()) {
-      if (typeof document.exitFullscreen === "function") {
-        const p = document.exitFullscreen();
-        if (p && typeof p.catch === "function") p.catch(() => {});
-      } else if (typeof document.webkitExitFullscreen === "function") {
-        document.webkitExitFullscreen();
-      } else if (typeof document.mozCancelFullScreen === "function") {
-        document.mozCancelFullScreen();
-      } else if (typeof document.msExitFullscreen === "function") {
-        document.msExitFullscreen();
-      }
-    }
-  } catch {
-    /* ignore */
-  }
-  try {
-    const orient = screen.orientation;
-    if (orient && typeof orient.unlock === "function") orient.unlock();
-  } catch {
-    /* ignore */
-  }
-}
-
 function setMenuTab(id, opts = {}) {
   const tabId = ["play", "settings", "codex", "code"].includes(id) ? id : "play";
   menuTab = tabId;
@@ -1397,7 +1329,6 @@ function updateHud() {
 }
 
 function showOverlay(title, subtitle, buttonText, opts = {}) {
-  exitGameFullscreen();
   titleEl.textContent = title;
   subtitleEl.textContent = subtitle;
   startBtn.textContent = buttonText;
@@ -4611,7 +4542,6 @@ window.addEventListener("keydown", (e) => {
 window.addEventListener("keyup", (e) => keys.delete(e.key));
 
 startBtn.addEventListener("click", () => {
-  requestGameFullscreen();
   ensureAudio();
   if (startBtn.dataset.mode === "challenge") {
     startChallenge();
@@ -4623,17 +4553,10 @@ startBtn.addEventListener("click", () => {
 });
 if (challengeBtn) {
   challengeBtn.addEventListener("click", () => {
-    requestGameFullscreen();
     ensureAudio();
     startChallenge();
   });
 }
-document.addEventListener("fullscreenchange", () => {
-  if (!isDocumentFullscreen() && !running) document.body.classList.remove("immersive");
-});
-document.addEventListener("webkitfullscreenchange", () => {
-  if (!isDocumentFullscreen() && !running) document.body.classList.remove("immersive");
-});
 if (menuTabsEl) {
   menuTabsEl.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-tab]");
