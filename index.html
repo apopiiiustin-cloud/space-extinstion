@@ -34,17 +34,23 @@
       </div>
     </header>
 
-    <div class="stage">
-      <canvas id="game" width="960" height="640" aria-label="Space Extinsion game"></canvas>
+    <div class="play-shell">
       <div id="touch-ui" class="touch-ui hidden" aria-hidden="true">
-        <button type="button" id="touch-pause" class="touch-pause" aria-label="Pause">II</button>
-        <div id="joy-base" class="joy-base">
-          <div id="joy-knob" class="joy-knob"></div>
+        <div class="touch-rail touch-rail-left">
+          <div id="joy-base" class="joy-base">
+            <div id="joy-knob" class="joy-knob"></div>
+          </div>
         </div>
-        <div class="touch-btns">
-          <button type="button" id="touch-special" class="touch-btn">SPC</button>
-          <button type="button" id="touch-fire" class="touch-btn fire">FIRE</button>
+        <div class="touch-rail touch-rail-right">
+          <button type="button" id="touch-pause" class="touch-pause" aria-label="Pause">II</button>
+          <div class="touch-btns">
+            <button type="button" id="touch-special" class="touch-btn">SPC</button>
+            <button type="button" id="touch-fire" class="touch-btn fire">FIRE</button>
+          </div>
         </div>
+      </div>
+      <div class="stage">
+        <canvas id="game" width="960" height="640" aria-label="Space Extinsion game"></canvas>
       </div>
     </div>
 
@@ -117,6 +123,6 @@
     <div id="toast" class="toast hidden"></div>
   </div>
 
-  <script type="module" src="game.js?v=mobile-opt-v1"></script>
+  <script type="module" src="game.js?v=mobile-opt-v2"></script>
 </body>
 </html>

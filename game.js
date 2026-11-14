@@ -601,35 +601,54 @@ function isDocumentFullscreen() {
   );
 }
 
-async function requestGameFullscreen() {
+/** Must run synchronously inside a user-gesture handler (tap/click). */
+function requestGameFullscreen() {
+  document.body.classList.add("immersive");
   const el = document.documentElement;
   try {
-    if (isDocumentFullscreen()) return true;
-    if (el.requestFullscreen) await el.requestFullscreen({ navigationUI: "hide" });
-    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-    else if (el.webkitRequestFullScreen) el.webkitRequestFullScreen();
-    else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
-    else if (el.msRequestFullscreen) el.msRequestFullscreen();
-    else return false;
+    if (!isDocumentFullscreen()) {
+      if (typeof el.requestFullscreen === "function") {
+        const p = el.requestFullscreen();
+        if (p && typeof p.catch === "function") p.catch(() => {});
+      } else if (typeof el.webkitRequestFullscreen === "function") {
+        el.webkitRequestFullscreen();
+      } else if (typeof el.webkitRequestFullScreen === "function") {
+        el.webkitRequestFullScreen();
+      } else if (typeof el.mozRequestFullScreen === "function") {
+        el.mozRequestFullScreen();
+      } else if (typeof el.msRequestFullscreen === "function") {
+        el.msRequestFullscreen();
+      }
+    }
   } catch {
-    return false;
+    /* API unsupported or blocked — immersive CSS still applies */
   }
   try {
     const orient = screen.orientation;
-    if (orient && typeof orient.lock === "function") await orient.lock("landscape");
+    if (orient && typeof orient.lock === "function") {
+      const p = orient.lock("landscape");
+      if (p && typeof p.catch === "function") p.catch(() => {});
+    }
   } catch {
-    /* orientation lock is optional */
+    /* optional */
   }
-  return isDocumentFullscreen();
 }
 
-async function exitGameFullscreen() {
+function exitGameFullscreen() {
+  document.body.classList.remove("immersive");
   try {
-    if (!isDocumentFullscreen()) return;
-    if (document.exitFullscreen) await document.exitFullscreen();
-    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-    else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-    else if (document.msExitFullscreen) document.msExitFullscreen();
+    if (isDocumentFullscreen()) {
+      if (typeof document.exitFullscreen === "function") {
+        const p = document.exitFullscreen();
+        if (p && typeof p.catch === "function") p.catch(() => {});
+      } else if (typeof document.webkitExitFullscreen === "function") {
+        document.webkitExitFullscreen();
+      } else if (typeof document.mozCancelFullScreen === "function") {
+        document.mozCancelFullScreen();
+      } else if (typeof document.msExitFullscreen === "function") {
+        document.msExitFullscreen();
+      }
+    }
   } catch {
     /* ignore */
   }
@@ -1456,7 +1475,6 @@ function challengeRulesFor(id) {
 }
 
 function startChallenge() {
-  requestGameFullscreen();
   challengeMode = true;
   challengeId = todayChallengeId();
   const rules = challengeRulesFor(challengeId);
@@ -1521,7 +1539,6 @@ function startChallenge() {
 }
 
 function startGame() {
-  requestGameFullscreen();
   ensureAudio();
   sfx("ui");
   nearMissRun = 0;
@@ -4594,6 +4611,8 @@ window.addEventListener("keydown", (e) => {
 window.addEventListener("keyup", (e) => keys.delete(e.key));
 
 startBtn.addEventListener("click", () => {
+  requestGameFullscreen();
+  ensureAudio();
   if (startBtn.dataset.mode === "challenge") {
     startChallenge();
     return;
@@ -4604,10 +4623,17 @@ startBtn.addEventListener("click", () => {
 });
 if (challengeBtn) {
   challengeBtn.addEventListener("click", () => {
+    requestGameFullscreen();
     ensureAudio();
     startChallenge();
   });
 }
+document.addEventListener("fullscreenchange", () => {
+  if (!isDocumentFullscreen() && !running) document.body.classList.remove("immersive");
+});
+document.addEventListener("webkitfullscreenchange", () => {
+  if (!isDocumentFullscreen() && !running) document.body.classList.remove("immersive");
+});
 if (menuTabsEl) {
   menuTabsEl.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-tab]");
