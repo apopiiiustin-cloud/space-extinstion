@@ -2613,22 +2613,19 @@ function firePlayerShot() {
   if (focused) bulletSpeed *= 1.35;
 
   if (triple) {
-    const opts = focused ? { size: 6, style: "focus" } : {};
-    firePlayerBullet(player.x - 16, y, -55, bulletSpeed, opts);
+    const opts = focused ? { size: 5, style: "focus" } : {};
+    firePlayerBullet(player.x - 12, y, -30, bulletSpeed, opts);
     firePlayerBullet(player.x, y, 0, bulletSpeed, opts);
-    firePlayerBullet(player.x + 16, y, 55, bulletSpeed, opts);
-    spark(player.x - 16, player.y - 8, focused ? "#ffffff" : "#9af0ff");
+    firePlayerBullet(player.x + 12, y, 30, bulletSpeed, opts);
+    spark(player.x - 12, player.y - 8, focused ? "#ffffff" : "#9af0ff");
     spark(player.x, player.y - 10, "#c8f8ff");
-    spark(player.x + 16, player.y - 8, focused ? "#ffffff" : "#9af0ff");
+    spark(player.x + 12, player.y - 8, focused ? "#ffffff" : "#9af0ff");
   } else if (twin) {
-    // Two clear directions (not overlapping parallel bolts)
-    const opts = focused ? { size: 6, style: "focus" } : {};
-    const ox = focused ? 18 : 12;
-    const spread = focused ? 70 : 28;
-    firePlayerBullet(player.x - ox, y, -spread, bulletSpeed, opts);
-    firePlayerBullet(player.x + ox, y, spread, bulletSpeed, opts);
-    spark(player.x - ox, player.y - 8, focused ? "#ffffff" : "#9af0ff");
-    spark(player.x + ox, player.y - 8, focused ? "#ffffff" : "#9af0ff");
+    // Straight dual beams — same as every other ship
+    firePlayerBullet(player.x - 10, y, 0, bulletSpeed);
+    firePlayerBullet(player.x + 10, y, 0, bulletSpeed);
+    spark(player.x - 10, player.y - 8, "#9af0ff");
+    spark(player.x + 10, player.y - 8, "#9af0ff");
   } else if (focused) {
     firePlayerBullet(player.x, y, 0, bulletSpeed, { size: 8, style: "focus" });
     spark(player.x, player.y - 10, "#ffffff");
