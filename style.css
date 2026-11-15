@@ -696,7 +696,7 @@ body.touch-device .touch-ui:not(.hidden) {
   align-items: flex-start;
   align-self: stretch;
   padding-left: 0;
-  margin-left: -0.35rem;
+  margin-left: -1.1rem;
 }
 
 .touch-rail-right {
@@ -717,7 +717,7 @@ body.touch-swap .touch-rail-left {
   padding-left: 0;
   padding-right: 0;
   margin-left: 0;
-  margin-right: -0.35rem;
+  margin-right: -1.1rem;
 }
 
 body.touch-swap .touch-rail-right {
