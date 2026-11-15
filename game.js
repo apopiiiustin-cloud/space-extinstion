@@ -51,10 +51,8 @@ const volumeSlider = document.getElementById("volume-slider");
 const muteBtn = document.getElementById("mute-btn");
 const joySizeSlider = document.getElementById("joy-size-slider");
 const btnSizeSlider = document.getElementById("btn-size-slider");
-const touchOpacitySlider = document.getElementById("touch-opacity-slider");
 const joySizeVal = document.getElementById("joy-size-val");
 const btnSizeVal = document.getElementById("btn-size-val");
-const touchOpacityVal = document.getElementById("touch-opacity-val");
 const swapSidesBtn = document.getElementById("swap-sides-btn");
 const resetTouchBtn = document.getElementById("reset-touch-btn");
 const menuTabsEl = document.querySelector(".menu-tabs");
@@ -397,7 +395,6 @@ function defaultTouchControls() {
   return {
     joySize: 148,
     btnSize: 68,
-    opacity: 70,
     swapSides: false,
   };
 }
@@ -430,7 +427,6 @@ function normalizeTouchControls(raw) {
   return {
     joySize: Math.max(100, Math.min(180, Number(t.joySize) || d.joySize)),
     btnSize: Math.max(48, Math.min(96, Number(t.btnSize) || d.btnSize)),
-    opacity: Math.max(35, Math.min(100, Number(t.opacity) || d.opacity)),
     swapSides: !!t.swapSides,
   };
 }
@@ -441,14 +437,11 @@ function applyTouchControls() {
   const root = document.documentElement;
   root.style.setProperty("--joy-size", `${t.joySize}px`);
   root.style.setProperty("--btn-size", `${t.btnSize}px`);
-  root.style.setProperty("--touch-opacity", String(Math.max(0.2, t.opacity / 100)));
   document.body.classList.toggle("touch-swap", t.swapSides);
   if (joySizeSlider) joySizeSlider.value = String(t.joySize);
   if (btnSizeSlider) btnSizeSlider.value = String(t.btnSize);
-  if (touchOpacitySlider) touchOpacitySlider.value = String(t.opacity);
   if (joySizeVal) joySizeVal.textContent = String(t.joySize);
   if (btnSizeVal) btnSizeVal.textContent = String(t.btnSize);
-  if (touchOpacityVal) touchOpacityVal.textContent = `${t.opacity}%`;
   if (swapSidesBtn) swapSidesBtn.textContent = t.swapSides ? "SIDES: SWAPPED" : "SWAP SIDES";
 }
 
@@ -4667,16 +4660,6 @@ if (btnSizeSlider) {
     save.touchControls = normalizeTouchControls({
       ...save.touchControls,
       btnSize: Number(btnSizeSlider.value),
-    });
-    applyTouchControls();
-    persistSave();
-  });
-}
-if (touchOpacitySlider) {
-  touchOpacitySlider.addEventListener("input", () => {
-    save.touchControls = normalizeTouchControls({
-      ...save.touchControls,
-      opacity: Number(touchOpacitySlider.value),
     });
     applyTouchControls();
     persistSave();
