@@ -1812,8 +1812,6 @@ function enemyShootAtPlayer(e) {
     fireEnemyBullet(e.x, e.y + e.h / 2, Math.cos(a) * 140, Math.sin(a) * 140, {
       style: "leech",
       size: 6,
-      homing: true,
-      turnRate: 2.2,
     });
     for (const ally of enemies) {
       if (ally === e) continue;
