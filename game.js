@@ -49,6 +49,14 @@ const codeCancelBtn = document.getElementById("code-cancel");
 const metaPanelEl = document.getElementById("meta-panel");
 const volumeSlider = document.getElementById("volume-slider");
 const muteBtn = document.getElementById("mute-btn");
+const joySizeSlider = document.getElementById("joy-size-slider");
+const btnSizeSlider = document.getElementById("btn-size-slider");
+const touchOpacitySlider = document.getElementById("touch-opacity-slider");
+const joySizeVal = document.getElementById("joy-size-val");
+const btnSizeVal = document.getElementById("btn-size-val");
+const touchOpacityVal = document.getElementById("touch-opacity-val");
+const swapSidesBtn = document.getElementById("swap-sides-btn");
+const resetTouchBtn = document.getElementById("reset-touch-btn");
 const menuTabsEl = document.querySelector(".menu-tabs");
 const recBtn = document.getElementById("rec-btn");
 const exportBtn = document.getElementById("export-btn");
@@ -385,6 +393,15 @@ function pickWeightedKind(weights) {
   return 0;
 }
 
+function defaultTouchControls() {
+  return {
+    joySize: 148,
+    btnSize: 68,
+    opacity: 70,
+    swapSides: false,
+  };
+}
+
 function defaultSave() {
   return {
     bestScore: 0,
@@ -403,7 +420,36 @@ function defaultSave() {
     stats: { runs: 0, wins: 0, timePlayed: 0, favoriteShip: "ice", shipPlays: {} },
     cosmeticTrail: false,
     aegisUnlocked: false,
+    touchControls: defaultTouchControls(),
   };
+}
+
+function normalizeTouchControls(raw) {
+  const d = defaultTouchControls();
+  const t = raw && typeof raw === "object" ? raw : {};
+  return {
+    joySize: Math.max(100, Math.min(180, Number(t.joySize) || d.joySize)),
+    btnSize: Math.max(48, Math.min(96, Number(t.btnSize) || d.btnSize)),
+    opacity: Math.max(35, Math.min(100, Number(t.opacity) || d.opacity)),
+    swapSides: !!t.swapSides,
+  };
+}
+
+function applyTouchControls() {
+  const t = normalizeTouchControls(save.touchControls);
+  save.touchControls = t;
+  const root = document.documentElement;
+  root.style.setProperty("--joy-size", `${t.joySize}px`);
+  root.style.setProperty("--btn-size", `${t.btnSize}px`);
+  root.style.setProperty("--touch-opacity", String(Math.max(0.2, t.opacity / 100)));
+  document.body.classList.toggle("touch-swap", t.swapSides);
+  if (joySizeSlider) joySizeSlider.value = String(t.joySize);
+  if (btnSizeSlider) btnSizeSlider.value = String(t.btnSize);
+  if (touchOpacitySlider) touchOpacitySlider.value = String(t.opacity);
+  if (joySizeVal) joySizeVal.textContent = String(t.joySize);
+  if (btnSizeVal) btnSizeVal.textContent = String(t.btnSize);
+  if (touchOpacityVal) touchOpacityVal.textContent = `${t.opacity}%`;
+  if (swapSidesBtn) swapSidesBtn.textContent = t.swapSides ? "SIDES: SWAPPED" : "SWAP SIDES";
 }
 
 function aegisQueryEnabled() {
@@ -450,6 +496,7 @@ function loadSave() {
       data.selectedShipId = "ice";
     }
     data.volume = Math.max(0, Math.min(1, Number(data.volume) || 0.7));
+    data.touchControls = normalizeTouchControls(data.touchControls);
     data.bestChallenge = Number(data.bestChallenge) || 0;
     data.bestChallengeWave = Number(data.bestChallengeWave) || 0;
     data.achievements = data.achievements && typeof data.achievements === "object" ? data.achievements : {};
@@ -4605,6 +4652,55 @@ if (muteBtn) {
     sfx("ui");
   });
 }
+if (joySizeSlider) {
+  joySizeSlider.addEventListener("input", () => {
+    save.touchControls = normalizeTouchControls({
+      ...save.touchControls,
+      joySize: Number(joySizeSlider.value),
+    });
+    applyTouchControls();
+    persistSave();
+  });
+}
+if (btnSizeSlider) {
+  btnSizeSlider.addEventListener("input", () => {
+    save.touchControls = normalizeTouchControls({
+      ...save.touchControls,
+      btnSize: Number(btnSizeSlider.value),
+    });
+    applyTouchControls();
+    persistSave();
+  });
+}
+if (touchOpacitySlider) {
+  touchOpacitySlider.addEventListener("input", () => {
+    save.touchControls = normalizeTouchControls({
+      ...save.touchControls,
+      opacity: Number(touchOpacitySlider.value),
+    });
+    applyTouchControls();
+    persistSave();
+  });
+}
+if (swapSidesBtn) {
+  swapSidesBtn.addEventListener("click", () => {
+    save.touchControls = normalizeTouchControls({
+      ...save.touchControls,
+      swapSides: !save.touchControls?.swapSides,
+    });
+    applyTouchControls();
+    persistSave();
+    sfx("ui");
+  });
+}
+if (resetTouchBtn) {
+  resetTouchBtn.addEventListener("click", () => {
+    save.touchControls = defaultTouchControls();
+    applyTouchControls();
+    persistSave();
+    sfx("ui");
+  });
+}
 if (recBtn) recBtn.addEventListener("click", () => toggleRecording());
 if (exportBtn) exportBtn.addEventListener("click", () => exportPlaySession());
 updateRecUi();
@@ -4774,6 +4870,7 @@ if (save.selectedShipId !== selectedShipId) {
 refreshMenuScores();
 renderLevelSelect();
 renderShipSelect();
+applyTouchControls();
 setMenuTab("play", { silent: true });
 applyTheme(LEVELS[Math.max(0, (save.selectedStartLevel || 1) - 1)].theme);
 resetPlayer(false);

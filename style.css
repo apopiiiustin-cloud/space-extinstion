@@ -480,10 +480,38 @@ body.touch-device .touch-hint {
   margin-bottom: 0.85rem;
 }
 
-#volume-slider {
+#volume-slider,
+#joy-size-slider,
+#btn-size-slider,
+#touch-opacity-slider {
   width: 100%;
   accent-color: var(--neon);
   cursor: pointer;
+}
+
+.touch-settings {
+  margin-top: 1rem;
+}
+
+.setting-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 0.55rem 0 0.25rem;
+  font-size: 0.78rem;
+  color: rgba(180, 210, 255, 0.78);
+}
+
+.setting-line strong {
+  font-family: Orbitron, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--gold);
+}
+
+.touch-layout-actions {
+  margin-top: 0.85rem;
 }
 
 .challenge-best {
@@ -678,27 +706,44 @@ body.touch-device .touch-ui:not(.hidden) {
   align-self: stretch;
 }
 
+body.touch-swap {
+  --touch-rail-left: 6.75rem;
+  --touch-rail-right: 10.5rem;
+}
+
+body.touch-swap .touch-rail-left {
+  grid-column: 3;
+  align-items: flex-end;
+  padding-left: 0;
+  padding-right: 0.15rem;
+}
+
+body.touch-swap .touch-rail-right {
+  grid-column: 1;
+}
+
 .joy-base {
   position: relative;
   left: auto;
   bottom: auto;
-  width: 148px;
-  height: 148px;
+  width: var(--joy-size, 148px);
+  height: var(--joy-size, 148px);
   border-radius: 50%;
   border: 1px solid rgba(61, 224, 255, 0.35);
-  background: rgba(4, 10, 24, 0.55);
+  background: rgba(4, 10, 24, var(--touch-opacity, 0.55));
   pointer-events: auto;
   touch-action: none;
   flex-shrink: 0;
+  opacity: 1;
 }
 
 .joy-knob {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 60px;
-  height: 60px;
-  margin: -30px 0 0 -30px;
+  width: 40%;
+  height: 40%;
+  margin: -20% 0 0 -20%;
   border-radius: 50%;
   background: rgba(61, 224, 255, 0.35);
   border: 1px solid rgba(61, 224, 255, 0.7);
@@ -718,14 +763,14 @@ body.touch-device .touch-ui:not(.hidden) {
 }
 
 .touch-btn {
-  width: 68px;
-  height: 68px;
+  width: var(--btn-size, 68px);
+  height: var(--btn-size, 68px);
   border-radius: 50%;
   border: 1px solid rgba(61, 224, 255, 0.5);
-  background: rgba(4, 14, 28, 0.7);
+  background: rgba(4, 14, 28, var(--touch-opacity, 0.7));
   color: var(--neon);
   font-family: Orbitron, sans-serif;
-  font-size: 0.7rem;
+  font-size: calc(var(--btn-size, 68px) * 0.16);
   letter-spacing: 0.06em;
   pointer-events: auto;
   touch-action: none;
@@ -755,14 +800,14 @@ body.touch-device .touch-ui:not(.hidden) {
   position: relative;
   top: auto;
   right: auto;
-  width: 44px;
-  height: 44px;
+  width: calc(var(--btn-size, 68px) * 0.65);
+  height: calc(var(--btn-size, 68px) * 0.65);
   border-radius: 8px;
   border: 1px solid rgba(61, 224, 255, 0.5);
-  background: rgba(4, 14, 28, 0.7);
+  background: rgba(4, 14, 28, var(--touch-opacity, 0.7));
   color: var(--neon);
   font-family: Orbitron, sans-serif;
-  font-size: 0.72rem;
+  font-size: calc(var(--btn-size, 68px) * 0.14);
   letter-spacing: 0.04em;
   pointer-events: auto;
   touch-action: none;
@@ -899,19 +944,13 @@ body.touch-device .touch-ui:not(.hidden) {
     --touch-rail-right: 5.5rem;
   }
 
+  body.touch-swap {
+    --touch-rail-left: 5.5rem;
+    --touch-rail-right: 8.75rem;
+  }
+
   .stage {
     width: 100%;
-  }
-
-  .joy-base {
-    width: 128px;
-    height: 128px;
-  }
-
-  .joy-knob {
-    width: 52px;
-    height: 52px;
-    margin: -26px 0 0 -26px;
   }
 
   .touch-rail-left {
@@ -920,18 +959,6 @@ body.touch-device .touch-ui:not(.hidden) {
 
   .touch-btns {
     gap: 0.4rem;
-  }
-
-  .touch-btn {
-    width: 58px;
-    height: 58px;
-    font-size: 0.58rem;
-  }
-
-  .touch-pause {
-    width: 36px;
-    height: 36px;
-    font-size: 0.6rem;
   }
 
   .touch-rail {

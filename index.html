@@ -99,6 +99,28 @@
           <div class="menu-actions">
             <button id="mute-btn" type="button" class="ghost">MUTE</button>
           </div>
+          <div class="menu-section touch-settings">
+            <div class="menu-label">TOUCH CONTROLS</div>
+            <label class="setting-line" for="joy-size-slider">
+              <span>Joystick size</span>
+              <strong id="joy-size-val">148</strong>
+            </label>
+            <input id="joy-size-slider" type="range" min="100" max="180" value="148" aria-label="Joystick size" />
+            <label class="setting-line" for="btn-size-slider">
+              <span>Button size</span>
+              <strong id="btn-size-val">68</strong>
+            </label>
+            <input id="btn-size-slider" type="range" min="48" max="96" value="68" aria-label="Button size" />
+            <label class="setting-line" for="touch-opacity-slider">
+              <span>Opacity</span>
+              <strong id="touch-opacity-val">70%</strong>
+            </label>
+            <input id="touch-opacity-slider" type="range" min="35" max="100" value="70" aria-label="Controls opacity" />
+            <div class="menu-actions touch-layout-actions">
+              <button id="swap-sides-btn" type="button" class="ghost">SWAP SIDES</button>
+              <button id="reset-touch-btn" type="button" class="ghost">RESET LAYOUT</button>
+            </div>
+          </div>
         </section>
 
         <section id="tab-codex" class="menu-tabpanel" role="tabpanel" aria-labelledby="tab-btn-codex" hidden>
@@ -123,6 +145,6 @@
     <div id="toast" class="toast hidden"></div>
   </div>
 
-  <script type="module" src="game.js?v=mobile-opt-v5"></script>
+  <script type="module" src="game.js?v=mobile-opt-v6"></script>
 </body>
 </html>
