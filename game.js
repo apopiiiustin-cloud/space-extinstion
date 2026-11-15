@@ -2605,40 +2605,37 @@ function firePlayerShot() {
   const triple = upgrades.triple || (upgrades.twin && player.doubleShot > 0);
   const twin = !triple && (upgrades.twin || player.doubleShot > 0);
   let bulletSpeed = -560 * bulletSpeedMul();
-  // Aegis/Tide/Apex: always the big focus bolt — no small→large ramp
+  // Aegis/Tide/Apex: big focus bolts (still respect twin / triple upgrades)
   const focused =
     selectedShip().id === "aegis" || selectedShip().id === "tide" || selectedShip().id === "apex";
   if (focused) bulletSpeed *= 1.35;
-
-  if (focused && !triple) {
-    firePlayerBullet(player.x, y, 0, bulletSpeed, { size: 8, style: "focus" });
-    spark(player.x, player.y - 10, "#ffffff");
-    const mul = (player.fireMul || 1) * 1.15;
-    player.cooldown = (player.rapidFire > 0 ? 0.11 : 0.2) * mul;
-    sfx("shoot");
-    return;
-  }
+  const focusOpts = focused
+    ? { size: triple ? 6 : twin ? 7 : 8, style: "focus" }
+    : {};
 
   if (triple) {
-    firePlayerBullet(player.x - 12, y, -30, bulletSpeed);
-    firePlayerBullet(player.x, y, 0, bulletSpeed);
-    firePlayerBullet(player.x + 12, y, 30, bulletSpeed);
-    spark(player.x - 12, player.y - 8, "#9af0ff");
-    spark(player.x, player.y - 10, "#c8f8ff");
-    spark(player.x + 12, player.y - 8, "#9af0ff");
+    firePlayerBullet(player.x - 12, y, -30, bulletSpeed, focusOpts);
+    firePlayerBullet(player.x, y, 0, bulletSpeed, focusOpts);
+    firePlayerBullet(player.x + 12, y, 30, bulletSpeed, focusOpts);
+    spark(player.x - 12, player.y - 8, focused ? "#ffffff" : "#9af0ff");
+    spark(player.x, player.y - 10, focused ? "#c8f8ff" : "#c8f8ff");
+    spark(player.x + 12, player.y - 8, focused ? "#ffffff" : "#9af0ff");
   } else if (twin) {
-    firePlayerBullet(player.x - 10, y, 0, bulletSpeed);
-    firePlayerBullet(player.x + 10, y, 0, bulletSpeed);
-    spark(player.x - 10, player.y - 8, "#9af0ff");
-    spark(player.x + 10, player.y - 8, "#9af0ff");
+    firePlayerBullet(player.x - 10, y, 0, bulletSpeed, focusOpts);
+    firePlayerBullet(player.x + 10, y, 0, bulletSpeed, focusOpts);
+    spark(player.x - 10, player.y - 8, focused ? "#ffffff" : "#9af0ff");
+    spark(player.x + 10, player.y - 8, focused ? "#ffffff" : "#9af0ff");
+  } else if (focused) {
+    firePlayerBullet(player.x, y, 0, bulletSpeed, { size: 8, style: "focus" });
+    spark(player.x, player.y - 10, "#ffffff");
   } else {
     firePlayerBullet(player.x, y, 0, bulletSpeed);
     spark(player.x - 8, player.y - 8, "#9af0ff");
     spark(player.x + 8, player.y - 8, "#9af0ff");
   }
 
-  const mul = player.fireMul || 1;
-  player.cooldown = (player.rapidFire > 0 ? 0.09 : 0.16) * mul;
+  const mul = (player.fireMul || 1) * (focused ? 1.15 : 1);
+  player.cooldown = (player.rapidFire > 0 ? (focused ? 0.11 : 0.09) : focused ? 0.2 : 0.16) * mul;
   sfx("shoot");
 }
 
