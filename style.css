@@ -75,7 +75,7 @@ textarea {
 }
 
 body.touch-device {
-  --touch-rail-left: 10.5rem;
+  --touch-rail-left: 11.25rem;
   --touch-rail-right: 6.75rem;
 }
 
@@ -695,7 +695,8 @@ body.touch-device .touch-ui:not(.hidden) {
   justify-content: center;
   align-items: flex-start;
   align-self: stretch;
-  padding-left: 0.15rem;
+  padding-left: 0;
+  margin-left: -0.35rem;
 }
 
 .touch-rail-right {
@@ -707,14 +708,16 @@ body.touch-device .touch-ui:not(.hidden) {
 
 body.touch-swap {
   --touch-rail-left: 6.75rem;
-  --touch-rail-right: 10.5rem;
+  --touch-rail-right: 11.25rem;
 }
 
 body.touch-swap .touch-rail-left {
   grid-column: 3;
   align-items: flex-end;
   padding-left: 0;
-  padding-right: 0.15rem;
+  padding-right: 0;
+  margin-left: 0;
+  margin-right: -0.35rem;
 }
 
 body.touch-swap .touch-rail-right {
@@ -939,13 +942,13 @@ body.touch-swap .touch-rail-right {
   }
 
   body.touch-device {
-    --touch-rail-left: 8.75rem;
+    --touch-rail-left: 9.5rem;
     --touch-rail-right: 5.5rem;
   }
 
   body.touch-swap {
     --touch-rail-left: 5.5rem;
-    --touch-rail-right: 8.75rem;
+    --touch-rail-right: 9.5rem;
   }
 
   .stage {
