@@ -75,7 +75,7 @@ textarea {
 }
 
 body.touch-device {
-  --touch-rail-left: 9rem;
+  --touch-rail-left: 10.5rem;
   --touch-rail-right: 6.75rem;
 }
 
@@ -666,8 +666,9 @@ body.touch-device .touch-ui:not(.hidden) {
   grid-column: 1;
   grid-row: 1;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   align-self: stretch;
+  padding-left: 0.15rem;
 }
 
 .touch-rail-right {
@@ -681,8 +682,8 @@ body.touch-device .touch-ui:not(.hidden) {
   position: relative;
   left: auto;
   bottom: auto;
-  width: 128px;
-  height: 128px;
+  width: 148px;
+  height: 148px;
   border-radius: 50%;
   border: 1px solid rgba(61, 224, 255, 0.35);
   background: rgba(4, 10, 24, 0.55);
@@ -695,9 +696,9 @@ body.touch-device .touch-ui:not(.hidden) {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 52px;
-  height: 52px;
-  margin: -26px 0 0 -26px;
+  width: 60px;
+  height: 60px;
+  margin: -30px 0 0 -30px;
   border-radius: 50%;
   background: rgba(61, 224, 255, 0.35);
   border: 1px solid rgba(61, 224, 255, 0.7);
@@ -894,7 +895,7 @@ body.touch-device .touch-ui:not(.hidden) {
   }
 
   body.touch-device {
-    --touch-rail-left: 7.5rem;
+    --touch-rail-left: 8.75rem;
     --touch-rail-right: 5.5rem;
   }
 
@@ -903,14 +904,18 @@ body.touch-device .touch-ui:not(.hidden) {
   }
 
   .joy-base {
-    width: 112px;
-    height: 112px;
+    width: 128px;
+    height: 128px;
   }
 
   .joy-knob {
-    width: 46px;
-    height: 46px;
-    margin: -23px 0 0 -23px;
+    width: 52px;
+    height: 52px;
+    margin: -26px 0 0 -26px;
+  }
+
+  .touch-rail-left {
+    align-items: flex-start;
   }
 
   .touch-btns {
