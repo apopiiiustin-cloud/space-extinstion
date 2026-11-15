@@ -9,6 +9,8 @@
   --line: rgba(61, 224, 255, 0.35);
   --hud-budget: 2.5rem;
   --app-gap: 0.75rem;
+  --touch-rail-left: 0px;
+  --touch-rail-right: 0px;
 }
 
 * {
@@ -63,6 +65,8 @@ textarea {
     calc(
       (100dvh - var(--hud-budget) - var(--app-gap) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))
         * 960 / 640
+        + var(--touch-rail-left)
+        + var(--touch-rail-right)
     )
   );
   display: grid;
@@ -71,24 +75,20 @@ textarea {
 }
 
 body.touch-device {
-  place-items: stretch;
-  padding: 0;
+  --touch-rail-left: 9rem;
+  --touch-rail-right: 6.75rem;
 }
 
 body.touch-device #app {
-  width: 100%;
-  max-width: none;
-  height: 100dvh;
-  height: 100svh;
-  box-sizing: border-box;
-  gap: 0.25rem;
-  padding:
-    max(0.2rem, env(safe-area-inset-top, 0px))
-    env(safe-area-inset-right, 0px)
-    max(0.2rem, env(safe-area-inset-bottom, 0px))
-    env(safe-area-inset-left, 0px);
-  align-content: stretch;
-  grid-template-rows: auto minmax(0, 1fr);
+  width: min(
+    100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px),
+    calc(
+      (100dvh - var(--hud-budget) - var(--app-gap) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))
+        * 960 / 640
+        + var(--touch-rail-left)
+        + var(--touch-rail-right)
+    )
+  );
 }
 
 .play-shell {
@@ -100,13 +100,14 @@ body.touch-device #app {
 }
 
 body.touch-device .play-shell {
-  /* left square | game | right square — equal leftover space beside the canvas */
-  grid-template-columns: minmax(6.5rem, 1fr) minmax(0, auto) minmax(5.5rem, 1fr);
+  grid-template-columns: var(--touch-rail-left) minmax(0, 1fr) var(--touch-rail-right);
   min-height: 0;
-  height: 100%;
-  max-height: none;
-  width: 100%;
-  align-items: stretch;
+  height: calc(
+    100dvh - var(--hud-budget) - var(--app-gap) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+  );
+  max-height: calc(
+    100dvh - var(--hud-budget) - var(--app-gap) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+  );
 }
 
 .hud {
@@ -185,15 +186,13 @@ body.touch-device .play-shell {
 
 body.touch-device .stage {
   grid-column: 2;
-  grid-row: 1;
-  height: 100%;
   width: auto;
-  max-height: 100%;
+  height: 100%;
   max-width: 100%;
+  max-height: 100%;
   aspect-ratio: 960 / 640;
-  margin: 0;
+  margin: 0 auto;
   align-self: center;
-  justify-self: center;
 }
 
 #game {
@@ -657,38 +656,33 @@ body.touch-device .touch-ui:not(.hidden) {
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
-  padding: 0;
+  padding: 0.35rem 0.2rem;
   pointer-events: none;
   min-width: 0;
   overflow: visible;
-  width: 100%;
-  height: 100%;
 }
 
 .touch-rail-left {
   grid-column: 1;
   grid-row: 1;
-  /* exact center of the left square between phone edge and game */
-  place-content: center;
-  place-items: center;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
 }
 
 .touch-rail-right {
   grid-column: 3;
   grid-row: 1;
-  place-content: center;
-  place-items: center;
+  justify-content: center;
+  align-self: stretch;
 }
 
 .joy-base {
   position: relative;
   left: auto;
   bottom: auto;
-  /* fill most of the left square, stay circular */
-  width: min(132px, 82%);
-  height: auto;
-  aspect-ratio: 1;
-  max-height: min(132px, 70%);
+  width: 128px;
+  height: 128px;
   border-radius: 50%;
   border: 1px solid rgba(61, 224, 255, 0.35);
   background: rgba(4, 10, 24, 0.55);
@@ -701,10 +695,9 @@ body.touch-device .touch-ui:not(.hidden) {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 40%;
-  height: 40%;
-  /* center relative to joy-base (margin % is of parent) */
-  margin: -20% 0 0 -20%;
+  width: 52px;
+  height: 52px;
+  margin: -26px 0 0 -26px;
   border-radius: 50%;
   background: rgba(61, 224, 255, 0.35);
   border: 1px solid rgba(61, 224, 255, 0.7);
@@ -900,13 +893,24 @@ body.touch-device .touch-ui:not(.hidden) {
     padding: 0.05rem 0.28rem;
   }
 
+  body.touch-device {
+    --touch-rail-left: 7.5rem;
+    --touch-rail-right: 5.5rem;
+  }
+
   .stage {
     width: 100%;
   }
 
   .joy-base {
-    width: min(118px, 86%);
-    max-height: min(118px, 72%);
+    width: 112px;
+    height: 112px;
+  }
+
+  .joy-knob {
+    width: 46px;
+    height: 46px;
+    margin: -23px 0 0 -23px;
   }
 
   .touch-btns {
