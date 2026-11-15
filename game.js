@@ -2602,29 +2602,33 @@ function fireDroneNova(d) {
 
 function firePlayerShot() {
   const y = player.y - player.h / 2;
-  const triple = upgrades.triple || (upgrades.twin && player.doubleShot > 0);
-  const twin = !triple && (upgrades.twin || player.doubleShot > 0);
+  const twinRank = stackRank("twin");
+  const hasTwin = upgrades.twin || twinRank >= 1 || player.doubleShot > 0;
+  const triple = upgrades.triple || twinRank >= 2 || (upgrades.twin && player.doubleShot > 0);
+  const twin = !triple && hasTwin;
   let bulletSpeed = -560 * bulletSpeedMul();
-  // Aegis/Tide/Apex: big focus bolts (still respect twin / triple upgrades)
+  // Aegis/Tide/Apex: focus bolts, but twin/triple must still fan out clearly
   const focused =
     selectedShip().id === "aegis" || selectedShip().id === "tide" || selectedShip().id === "apex";
   if (focused) bulletSpeed *= 1.35;
-  const focusOpts = focused
-    ? { size: triple ? 6 : twin ? 7 : 8, style: "focus" }
-    : {};
 
   if (triple) {
-    firePlayerBullet(player.x - 12, y, -30, bulletSpeed, focusOpts);
-    firePlayerBullet(player.x, y, 0, bulletSpeed, focusOpts);
-    firePlayerBullet(player.x + 12, y, 30, bulletSpeed, focusOpts);
-    spark(player.x - 12, player.y - 8, focused ? "#ffffff" : "#9af0ff");
-    spark(player.x, player.y - 10, focused ? "#c8f8ff" : "#c8f8ff");
-    spark(player.x + 12, player.y - 8, focused ? "#ffffff" : "#9af0ff");
+    const opts = focused ? { size: 6, style: "focus" } : {};
+    firePlayerBullet(player.x - 16, y, -55, bulletSpeed, opts);
+    firePlayerBullet(player.x, y, 0, bulletSpeed, opts);
+    firePlayerBullet(player.x + 16, y, 55, bulletSpeed, opts);
+    spark(player.x - 16, player.y - 8, focused ? "#ffffff" : "#9af0ff");
+    spark(player.x, player.y - 10, "#c8f8ff");
+    spark(player.x + 16, player.y - 8, focused ? "#ffffff" : "#9af0ff");
   } else if (twin) {
-    firePlayerBullet(player.x - 10, y, 0, bulletSpeed, focusOpts);
-    firePlayerBullet(player.x + 10, y, 0, bulletSpeed, focusOpts);
-    spark(player.x - 10, player.y - 8, focused ? "#ffffff" : "#9af0ff");
-    spark(player.x + 10, player.y - 8, focused ? "#ffffff" : "#9af0ff");
+    // Two clear directions (not overlapping parallel bolts)
+    const opts = focused ? { size: 6, style: "focus" } : {};
+    const ox = focused ? 18 : 12;
+    const spread = focused ? 70 : 28;
+    firePlayerBullet(player.x - ox, y, -spread, bulletSpeed, opts);
+    firePlayerBullet(player.x + ox, y, spread, bulletSpeed, opts);
+    spark(player.x - ox, player.y - 8, focused ? "#ffffff" : "#9af0ff");
+    spark(player.x + ox, player.y - 8, focused ? "#ffffff" : "#9af0ff");
   } else if (focused) {
     firePlayerBullet(player.x, y, 0, bulletSpeed, { size: 8, style: "focus" });
     spark(player.x, player.y - 10, "#ffffff");
